@@ -42,6 +42,7 @@ my $port      = 27100; # port to where to listen for data from SvenDS
 my $realtime = 0;
 my $today;
 my @lines;
+my $gi = MaxMind::DB::Reader->new(file => $geo);
 
 
 if (@ARGV != 1) {
@@ -169,7 +170,6 @@ sub procstats {
    }
 
    unless ($debug) {
-      my $gi  = MaxMind::DB::Reader->new(file => $geo);
       my $sth = $dbh->prepare('REPLACE INTO stats (steamid64, steamid, name, id, score, lastscore, deaths, lastdeaths, scoregain, deathgain, joins, geo, lat, lon, datapoints, datapointgain, seen) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
 
       for (keys %{$stats}) {
@@ -269,9 +269,15 @@ sub socketstream {
 
       if ($sockline =~ /^L [0-9]{2}\/[0-9]{2}\/[0-9]{4} - ([0-9]{2}:[0-9]{2}:[0-9]{2}): Log file closed/) {
          print "Map has changed, flushing data to database...\n";
+				 print "Array size before: ";
+				 print scalar @lines;
+				 print "\n";
          procstats();
          print "Data has been saved!\n";
          @lines = (); # Clear array
+				 print "Array size after: ";
+				 print scalar @lines;
+				 print "\n";
          $today = strftime '%Y-%m-%d', localtime; # Hack: update today's var date
       }
    }
