@@ -287,9 +287,7 @@ sub socketstream {
       # remove newline from the end of line
       chomp $sockline;
 
-      if ($debug){
-         print "($hishost:$origport) -> $sockline\n";
-      }
+      # print "($hishost:$origport) -> $sockline\n";
 
       push @lines, $sockline;
 
