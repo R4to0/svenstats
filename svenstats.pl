@@ -29,7 +29,7 @@ use IO::Socket;
 my $db        = "$ENV{'HOME'}/scstats/scstats.db";
 my $geo       = "$ENV{'HOME'}/gus/GeoLite2-City.mmdb";
 my $maxinc    = 450; # maximum score difference between two datapoints to prevent arbitrary player scores set by some maps
-my @blacklist = qw(ayakashi_banquet blackmesa_spacebasement bstore kbd2a runforfreedom_alpha1 skate_city trempler_weapons); # map blacklist, space seperated, lowercase
+my @blacklist = qw(4ways arcade ayakashi_banquet blackmesa_spacebasement bhop_party botrace bstore def_hakase evilmansion fuchs_halloween halloween_hospital hl_c15 kbd2a last4 mmm mmm_v2 ragemap2019b runforfreedom_alpha1 secretcity secretcity2 secretcity3 secretcity4beta secretcity5beta secretcity6b6 secretcitykeen_beta secretcitykeen_2_alpha skate_city smashtv_beta svencoop1 toonrun3 trempler_weapons uboa_rampage uboa_rampage_ii); # map blacklist, space seperated, lowercase
 
 ### R4to0 rt changes start
 my $buflength = 1024; # seems to be enough
