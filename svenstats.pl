@@ -48,13 +48,17 @@ my @lines;
 my $gi = MaxMind::DB::Reader->new(file => $geo);
 ### R4to0 rt changes end
 
-if (@ARGV != 1) {
+if (@ARGV < 1) {
    say "Usage: $0 <logfile>";
    exit;
 }
 elsif ($ARGV[0] eq "-realtime") { # R4to0 rt changes start
    $realtime = 1;
    socketstream();
+} 
+elsif ($ARGV[0] eq "-importdir") {
+   massimport();
+   exit;
 } # R4to0 rt changes end
 elsif (! -f $ARGV[0] || ! -r $ARGV[0]) {
    say "$ARGV[0] is not a regular file or can't be read.";
@@ -99,7 +103,12 @@ sub procstats { # R4to0 rt changes
       $ids{idto64($1)}++ if ($line =~ $re);
    }
 
-   exit unless (keys %ids > 0);
+   #exit unless (keys %ids > 0);
+   unless (keys %ids > 0) {
+      $dbh->disconnect; # fix rollback() issue -R4to0
+      #exit
+	  return; # for the mass import function continue -R4to0
+   }
 
    my $where = 'steamid64 IN (';
    $where .= $_ . ',' foreach (keys %ids);
@@ -306,5 +315,21 @@ sub socketstream {
       }
    }
    die "recv: $!";
+}
+
+# hack function to mass import without having to start a new process and slowing down with maxmind db loading everytime
+sub massimport {
+   opendir my $dh, $ARGV[1] or die "Cannot open directory: $!";
+   my @files = grep {!/^\./} readdir $dh;
+   closedir $dh;
+
+   foreach (@files) {
+      print "Processing $_\n";
+	  $today = fileparse( "$ARGV[1]/$_", qw(.log) );
+	  @lines = read_file( "$ARGV[1]/$_", binmode => ':raw', chomp => 1 ) ;
+	  procstats();
+	  $today = undef;
+	  @lines = undef;
+   }
 }
 ### R4to0 rt changes end
